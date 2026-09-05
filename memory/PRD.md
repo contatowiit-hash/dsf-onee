@@ -43,6 +43,12 @@ Landing page moderna, profissional e persuasiva para o produto educacional "Desa
 - Seta decorativa removida dos cards de conteúdo (não são clicáveis).
 - Acessibilidade: MotionConfig reducedMotion="user" + CSS prefers-reduced-motion (marquee/pulse), :focus-visible visível, selo do hero compactado no mobile.
 
+## Atualização 2026-09-05 (v4) — Área do curso + Google Auth
+- Google Auth (Emergent-managed): login antes do pagamento nos botões do upsell; botão "Entrar" na navbar; sessões httpOnly (7 dias) em db.user_sessions; usuários em db.users (user_id UUID, _id nunca exposto). Endpoints: POST /api/auth/session, GET /api/auth/me, POST /api/auth/logout.
+- Área do curso em /curso (protegida): sidebar escura + conteúdo claro/escuro (toggle, persiste em localStorage), Dashboard (saudação, card de progresso real, ações rápidas, módulos), 7 módulos com aulas reais + quiz por módulo (progresso por usuário em db.progress, módulos desbloqueiam sequencialmente), Flashcards (12 cards, flip 3D), Simulado (10 questões, 10 min, +10 XP/acerto, revisão de respostas), Gamificação (XP, nível, 6 conquistas), Ranking (dados DEMO + posição real do usuário), Certificado (bloqueado até 100%), Configurações (conta, tema, logout).
+- Professor IA continua como botão flutuante global; item "Professor IA" na sidebar abre o chat via evento.
+- Liberação por pagamento (API Cakto) NÃO implementada ainda — qualquer usuário logado acessa /curso.
+
 ## Pendências / NÃO implementado
 - Envio real do checklist por e-mail (leads ficam salvos; a mensagem de sucesso menciona e-mail — envio depende de integração futura com e-mail marketing).
 - Checkout real (ambos os botões do upsell apontam para placeholders Hotmart — substituir pelas URLs reais dos dois produtos).

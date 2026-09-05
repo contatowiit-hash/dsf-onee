@@ -30,6 +30,12 @@ export default function ProfessorWidget() {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
   }, [messages, loading, open]);
 
+  useEffect(() => {
+    const openFromSidebar = () => setOpen(true);
+    window.addEventListener("open-professor", openFromSidebar);
+    return () => window.removeEventListener("open-professor", openFromSidebar);
+  }, []);
+
   const send = async (preset) => {
     const msg = (preset ?? input).trim();
     if (!msg || loading) return;

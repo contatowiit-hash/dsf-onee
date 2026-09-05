@@ -1,15 +1,16 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, Depends
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from openai import AsyncOpenAI
+import httpx
 import os
 import logging
 import uuid
 from pathlib import Path
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -100,6 +101,159 @@ async def professor(input: ProfessorMessage):
         {"session_id": session_id, "role": "assistant", "content": reply, "created_at": now},
     ])
     return {"reply": reply, "session_id": session_id}
+
+
+# ---------- Google Auth (Emergent-managed) ----------
+
+class SessionExchange(BaseModel):
+    session_id: str
+
+
+@api_router.post("/auth/session")
+async def auth_session(input: SessionExchange, response: Response):
+    async with httpx.AsyncClient() as http:
+        r = await http.get(
+            "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
+            headers={"X-Session-ID": input.session_id},
+            timeout=15,
+        )
+    if r.status_code != 200:
+        raise HTTPException(status_code=401, detail="Sessão inválida.")
+    data = r.json()
+    email = data["email"].strip().lower()
+    user_doc = await db.users.find_one({"email": email}, {"_id": 0})
+    if user_doc:
+        await db.users.update_one(
+            {"email": email},
+            {"$set": {"name": data.get("name", ""), "picture": data.get("picture", "")}},
+        )
+        user_doc["name"] = data.get("name", "")
+        user_doc["picture"] = data.get("picture", "")
+    else:
+        user_doc = {
+            "user_id": f"user_{uuid.uuid4().hex[:12]}",
+            "email": email,
+            "name": data.get("name", ""),
+            "picture": data.get("picture", ""),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        await db.users.insert_one({**user_doc})
+    token = data["session_token"]
+    await db.user_sessions.insert_one({
+        "user_id": user_doc["user_id"],
+        "session_token": token,
+        "expires_at": (datetime.now(timezone.utc) + timedelta(days=7)).isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+    response.set_cookie(
+        "session_token", token, path="/", secure=True, httponly=True,
+        samesite="none", max_age=7 * 24 * 3600,
+    )
+    return user_doc
+
+
+async def get_current_user(request: Request):
+    token = request.cookies.get("session_token")
+    auth = request.headers.get("Authorization")
+    if not token and auth and auth.startswith("Bearer "):
+        token = auth[7:]
+    if not token:
+        raise HTTPException(status_code=401, detail="Não autenticado.")
+    session = await db.user_sessions.find_one({"session_token": token}, {"_id": 0})
+    if not session:
+        raise HTTPException(status_code=401, detail="Sessão inválida.")
+    expires_at = session["expires_at"]
+    if isinstance(expires_at, str):
+        expires_at = datetime.fromisoformat(expires_at)
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    if expires_at < datetime.now(timezone.utc):
+        raise HTTPException(status_code=401, detail="Sessão expirada.")
+    user = await db.users.find_one({"user_id": session["user_id"]}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=401, detail="Usuário não encontrado.")
+    return user
+
+
+@api_router.get("/auth/me")
+async def auth_me(user=Depends(get_current_user)):
+    return user
+
+
+@api_router.post("/auth/logout")
+async def auth_logout(request: Request, response: Response):
+    token = request.cookies.get("session_token")
+    if token:
+        await db.user_sessions.delete_many({"session_token": token})
+    response.delete_cookie("session_token", path="/", secure=True, samesite="none")
+    return {"status": "ok"}
+
+
+# ---------- Progresso do aluno ----------
+
+def _default_progress(user_id):
+    return {
+        "user_id": user_id,
+        "completed_lessons": [],
+        "xp": 0,
+        "simulados": [],
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+@api_router.get("/progress")
+async def get_progress(user=Depends(get_current_user)):
+    doc = await db.progress.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not doc:
+        doc = _default_progress(user["user_id"])
+        await db.progress.insert_one({**doc})
+    return doc
+
+
+class LessonComplete(BaseModel):
+    lesson_key: str
+
+
+@api_router.post("/progress/lesson")
+async def complete_lesson(input: LessonComplete, user=Depends(get_current_user)):
+    doc = await db.progress.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not doc:
+        doc = _default_progress(user["user_id"])
+        await db.progress.insert_one({**doc})
+    if input.lesson_key not in doc["completed_lessons"]:
+        await db.progress.update_one(
+            {"user_id": user["user_id"]},
+            {"$push": {"completed_lessons": input.lesson_key}, "$inc": {"xp": 10}},
+        )
+        doc["completed_lessons"].append(input.lesson_key)
+        doc["xp"] += 10
+    return doc
+
+
+class SimuladoResult(BaseModel):
+    score: int
+    total: int
+
+
+@api_router.post("/progress/simulado")
+async def save_simulado(input: SimuladoResult, user=Depends(get_current_user)):
+    doc = await db.progress.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    if not doc:
+        doc = _default_progress(user["user_id"])
+        await db.progress.insert_one({**doc})
+    gained = input.score * 10
+    record = {
+        "score": input.score,
+        "total": input.total,
+        "date": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.progress.update_one(
+        {"user_id": user["user_id"]},
+        {"$push": {"simulados": record}, "$inc": {"xp": gained}},
+    )
+    doc["simulados"].append(record)
+    doc["xp"] += gained
+    return doc
 
 
 app.include_router(api_router)

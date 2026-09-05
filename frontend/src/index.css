@@ -24,7 +24,7 @@ html.lenis {
         --popover-foreground: 222 47% 8%;
         --primary: 222 47% 8%;
         --primary-foreground: 72 100% 50%;
-        --secondary: 80 12% 95%;
+        --secondary: 80 12% 93%;
         --secondary-foreground: 222 47% 8%;
         --muted: 80 12% 95%;
         --muted-foreground: 215 16% 47%;
@@ -32,10 +32,32 @@ html.lenis {
         --accent-foreground: 222 47% 8%;
         --destructive: 0 84.2% 60.2%;
         --destructive-foreground: 0 0% 98%;
-        --border: 214 20% 90%;
-        --input: 214 20% 90%;
+        --border: 214 20% 88%;
+        --input: 214 20% 88%;
         --ring: 72 100% 40%;
         --radius: 0.5rem;
+    }
+
+    .dark {
+        --background: 222 47% 7%;
+        --foreground: 60 20% 96%;
+        --card: 222 38% 11%;
+        --card-foreground: 60 20% 96%;
+        --popover: 222 38% 11%;
+        --popover-foreground: 60 20% 96%;
+        --primary: 72 100% 50%;
+        --primary-foreground: 222 47% 8%;
+        --secondary: 222 28% 16%;
+        --secondary-foreground: 60 20% 96%;
+        --muted: 222 28% 16%;
+        --muted-foreground: 215 16% 62%;
+        --accent: 72 100% 50%;
+        --accent-foreground: 222 47% 8%;
+        --destructive: 0 62.8% 50%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 222 24% 20%;
+        --input: 222 24% 20%;
+        --ring: 72 100% 50%;
     }
 }
 

@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Zap, Check, GraduationCap } from "lucide-react";
+import { X, Zap, Check, GraduationCap, LogIn } from "lucide-react";
 import { EASE } from "@/components/Reveal";
+import { useAuth } from "@/context/AuthContext";
 
 const CHECKOUT_ESSENCIAL = "https://pay.hotmart.com/placeholder-desafio-onee-essencial";
 const CHECKOUT_COMPLETO = "https://pay.hotmart.com/placeholder-desafio-onee-completo";
@@ -14,6 +15,17 @@ const ESSENCIAL_ITEMS = [
 ];
 
 export default function UpsellModal({ open, onClose }) {
+  const { user, login } = useAuth();
+
+  const goCheckout = (url) => {
+    if (!user) {
+      onClose();
+      login();
+      return;
+    }
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <AnimatePresence>
       {open && (
@@ -66,15 +78,13 @@ export default function UpsellModal({ open, onClose }) {
                     </li>
                   ))}
                 </ul>
-                <a
-                  href={CHECKOUT_ESSENCIAL}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => goCheckout(CHECKOUT_ESSENCIAL)}
                   data-testid="upsell-essential-button"
                   className="mt-7 flex items-center justify-center gap-2 rounded-full border-2 border-ink px-6 py-3.5 font-display text-sm font-extrabold text-ink transition-all duration-200 hover:-translate-y-0.5 hover:bg-ink hover:text-volt active:translate-y-0 active:scale-[0.98]"
                 >
                   CONTINUAR COM ESSENCIAL
-                </a>
+                </button>
               </div>
 
               <div className="relative flex flex-col rounded-2xl border-2 border-ink bg-ink p-6 text-white shadow-[8px_8px_0_0_#CCFF00]">
@@ -98,21 +108,23 @@ export default function UpsellModal({ open, onClose }) {
                     energética
                   </li>
                 </ul>
-                <a
-                  href={CHECKOUT_COMPLETO}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => goCheckout(CHECKOUT_COMPLETO)}
                   data-testid="upsell-complete-button"
                   className="group mt-7 flex items-center justify-center gap-2 rounded-full bg-volt px-6 py-3.5 font-display text-sm font-extrabold text-ink transition-all duration-200 hover:-translate-y-0.5 hover:bg-bolt active:translate-y-0 active:scale-[0.98]"
                 >
                   QUERO O COMPLETO
                   <Zap className="h-4 w-4 transition-transform duration-200 group-hover:rotate-12" fill="currentColor" />
-                </a>
+                </button>
               </div>
             </div>
 
             <p className="mt-6 text-center text-xs text-slate-500">
               Pagamento único • 7 dias de garantia incondicional nos dois planos
+            </p>
+            <p className="mt-2 flex items-center justify-center gap-1.5 text-center text-xs text-slate-500">
+              <LogIn className="h-3.5 w-3.5" />
+              Antes de pagar, você se identifica com sua conta Google.
             </p>
           </motion.div>
         </motion.div>
