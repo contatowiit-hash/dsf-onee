@@ -31,7 +31,12 @@ PROFESSOR_SYSTEM_PROMPT = (
     "português do Brasil, com linguagem simples, didática e encorajadora. Seja direto: "
     "respostas com no máximo 120 palavras. Use exemplos do dia a dia (conta de luz, "
     "chuveiro elétrico, geladeira, lâmpadas). Se a pergunta não tiver relação com estudos, "
-    "energia ou ciências, redirecione educadamente para o tema da olimpíada."
+    "energia ou ciências, redirecione educadamente para o tema da olimpíada. "
+    "Você também atua como tutor durante as aulas e os quizzes: quando o aluno disser que "
+    "não entendeu, reexplique de outro jeito, com outro exemplo do cotidiano; quando ele "
+    "pedir uma dica, oriente o raciocínio SEM revelar a resposta da questão; quando ele "
+    "errar, explique o motivo do erro com carinho e indique o que revisar. Nunca entregue "
+    "a resposta pronta de uma questão: conduza o aluno a concluir sozinho."
 )
 
 app = FastAPI()
@@ -74,6 +79,7 @@ async def leads_count():
 class ProfessorMessage(BaseModel):
     message: str
     session_id: Optional[str] = None
+    context: Optional[str] = None
 
 
 @api_router.post("/professor")
@@ -85,7 +91,14 @@ async def professor(input: ProfessorMessage):
     history = await db.professor_chats.find(
         {"session_id": session_id}, {"_id": 0}
     ).sort("created_at", 1).to_list(24)
-    messages = [{"role": "system", "content": PROFESSOR_SYSTEM_PROMPT}]
+    system_prompt = PROFESSOR_SYSTEM_PROMPT
+    if input.context:
+        system_prompt += (
+            "\n\nO aluno está vendo agora este conteúdo/questão: "
+            + input.context[:500]
+            + "\nUse esse contexto para orientar o raciocínio, sem entregar a resposta de cara."
+        )
+    messages = [{"role": "system", "content": system_prompt}]
     messages += [{"role": h["role"], "content": h["content"]} for h in history[-12:]]
     messages.append({"role": "user", "content": text})
     completion = await groq_client.chat.completions.create(
@@ -197,8 +210,13 @@ def _default_progress(user_id):
         "completed_lessons": [],
         "xp": 0,
         "simulados": [],
+        "activity_dates": [],
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
+
+
+def _today():
+    return datetime.now(timezone.utc).date().isoformat()
 
 
 @api_router.get("/progress")
@@ -207,11 +225,21 @@ async def get_progress(user=Depends(get_current_user)):
     if not doc:
         doc = _default_progress(user["user_id"])
         await db.progress.insert_one({**doc})
+    today = _today()
+    doc.setdefault("activity_dates", [])
+    if today not in doc["activity_dates"]:
+        await db.progress.update_one(
+            {"user_id": user["user_id"]},
+            {"$push": {"activity_dates": today}, "$inc": {"xp": 5}},
+        )
+        doc["activity_dates"].append(today)
+        doc["xp"] += 5
     return doc
 
 
 class LessonComplete(BaseModel):
     lesson_key: str
+    quiz_correct: Optional[int] = None
 
 
 @api_router.post("/progress/lesson")
@@ -220,13 +248,21 @@ async def complete_lesson(input: LessonComplete, user=Depends(get_current_user))
     if not doc:
         doc = _default_progress(user["user_id"])
         await db.progress.insert_one({**doc})
+    doc.setdefault("activity_dates", [])
+    today = _today()
+    if today not in doc["activity_dates"]:
+        await db.progress.update_one(
+            {"user_id": user["user_id"]}, {"$push": {"activity_dates": today}}
+        )
+        doc["activity_dates"].append(today)
     if input.lesson_key not in doc["completed_lessons"]:
+        gained = 25 + (input.quiz_correct or 0) * 10
         await db.progress.update_one(
             {"user_id": user["user_id"]},
-            {"$push": {"completed_lessons": input.lesson_key}, "$inc": {"xp": 10}},
+            {"$push": {"completed_lessons": input.lesson_key}, "$inc": {"xp": gained}},
         )
         doc["completed_lessons"].append(input.lesson_key)
-        doc["xp"] += 10
+        doc["xp"] += gained
     return doc
 
 
@@ -241,16 +277,19 @@ async def save_simulado(input: SimuladoResult, user=Depends(get_current_user)):
     if not doc:
         doc = _default_progress(user["user_id"])
         await db.progress.insert_one({**doc})
-    gained = input.score * 10
+    doc.setdefault("activity_dates", [])
+    today = _today()
+    gained = 100 + input.score * 10
     record = {
         "score": input.score,
         "total": input.total,
         "date": datetime.now(timezone.utc).isoformat(),
     }
-    await db.progress.update_one(
-        {"user_id": user["user_id"]},
-        {"$push": {"simulados": record}, "$inc": {"xp": gained}},
-    )
+    updates = {"$push": {"simulados": record}, "$inc": {"xp": gained}}
+    if today not in doc["activity_dates"]:
+        updates["$push"]["activity_dates"] = today
+        doc["activity_dates"].append(today)
+    await db.progress.update_one({"user_id": user["user_id"]}, updates)
     doc["simulados"].append(record)
     doc["xp"] += gained
     return doc

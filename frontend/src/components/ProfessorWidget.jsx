@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
-import { GraduationCap, X, Send, Loader2 } from "lucide-react";
+import { GraduationCap, X, Send, Loader2, Lightbulb, MessageCircleQuestion, RefreshCw, Sparkles } from "lucide-react";
 import { EASE } from "@/components/Reveal";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -12,8 +12,16 @@ const SUGGESTIONS = [
   "O que é eficiência energética?",
 ];
 
+const TUTOR_CHIPS = [
+  { label: "Não entendi", icon: MessageCircleQuestion },
+  { label: "Explique de outra forma", icon: RefreshCw },
+  { label: "Me dê uma dica", icon: Lightbulb },
+  { label: "Me dê outro exemplo", icon: Sparkles },
+];
+
 export default function ProfessorWidget() {
   const [open, setOpen] = useState(false);
+  const [context, setContext] = useState(null);
   const [messages, setMessages] = useState([
     {
       role: "assistant",
@@ -31,7 +39,10 @@ export default function ProfessorWidget() {
   }, [messages, loading, open]);
 
   useEffect(() => {
-    const openFromSidebar = () => setOpen(true);
+    const openFromSidebar = (e) => {
+      setContext(e.detail?.context ?? null);
+      setOpen(true);
+    };
     window.addEventListener("open-professor", openFromSidebar);
     return () => window.removeEventListener("open-professor", openFromSidebar);
   }, []);
@@ -43,7 +54,11 @@ export default function ProfessorWidget() {
     setMessages((m) => [...m, { role: "user", content: msg }]);
     setLoading(true);
     try {
-      const { data } = await axios.post(`${API}/professor`, { message: msg, session_id: sessionId });
+      const { data } = await axios.post(`${API}/professor`, {
+        message: msg,
+        session_id: sessionId,
+        context,
+      });
       setSessionId(data.session_id);
       setMessages((m) => [...m, { role: "assistant", content: data.reply }]);
     } catch {
@@ -86,7 +101,9 @@ export default function ProfessorWidget() {
               </span>
               <div>
                 <p className="font-display text-sm font-extrabold leading-tight">Professor IA</p>
-                <p className="text-[11px] text-slate-400">Demonstração • incluso no plano Completo</p>
+                <p className="text-[11px] text-slate-400">
+                  {context ? "Tutor da questão que você está vendo" : "Seu tutor de energia e eficiência"}
+                </p>
               </div>
             </div>
 
@@ -111,6 +128,21 @@ export default function ProfessorWidget() {
                   </p>
                 </div>
               )}
+            </div>
+
+            <div className="flex flex-wrap gap-1.5 border-t border-slate-100 bg-paper px-3 py-2">
+              {TUTOR_CHIPS.map((chip) => (
+                <button
+                  key={chip.label}
+                  onClick={() => send(chip.label)}
+                  disabled={loading}
+                  className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-600 transition-colors hover:border-ink hover:text-ink disabled:opacity-50"
+                  data-testid={`professor-chip-${chip.label.toLowerCase().replace(/\s+/g, "-")}`}
+                >
+                  <chip.icon className="h-3 w-3" />
+                  {chip.label}
+                </button>
+              ))}
             </div>
 
             {messages.length === 1 && (

@@ -10,6 +10,7 @@ import CourseLayout from "@/course/CourseLayout";
 import Dashboard from "@/course/pages/Dashboard";
 import ModulesPage from "@/course/pages/ModulesPage";
 import ModulePage from "@/course/pages/ModulePage";
+import LessonPage from "@/course/pages/LessonPage";
 import Flashcards from "@/course/pages/Flashcards";
 import Simulado from "@/course/pages/Simulado";
 import Gamificacao from "@/course/pages/Gamificacao";
@@ -37,6 +38,7 @@ function AppRouter() {
         <Route index element={<Dashboard />} />
         <Route path="modulos" element={<ModulesPage />} />
         <Route path="modulo/:id" element={<ModulePage />} />
+        <Route path="modulo/:id/aula/:lessonId" element={<LessonPage />} />
         <Route path="flashcards" element={<Flashcards />} />
         <Route path="simulado" element={<Simulado />} />
         <Route path="gamificacao" element={<Gamificacao />} />

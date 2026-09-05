@@ -1,8 +1,9 @@
 import { Link, useOutletContext } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { MODULES, TOTAL_LESSONS, nextLesson } from "@/course/data/modules";
+import { levelFor, streakFrom } from "@/course/data/gamification";
 import ModuleRow from "@/course/components/ModuleRow";
-import { Timer, Layers, Gamepad2, BookOpen, ArrowRight } from "lucide-react";
+import { Timer, Layers, Gamepad2, BookOpen, ArrowRight, Zap, Flame } from "lucide-react";
 
 const ACTIONS = [
   {
@@ -42,6 +43,10 @@ export default function Dashboard() {
   const pct = Math.round((completed.length / TOTAL_LESSONS) * 100);
   const next = nextLesson(completed);
   const firstName = user?.name?.split(" ")[0] ?? "estudante";
+  const xp = progress?.xp ?? 0;
+  const { current: level } = levelFor(xp);
+  const streak = streakFrom(progress?.activity_dates);
+  const simuladosCount = progress?.simulados?.length ?? 0;
 
   return (
     <div className="space-y-10" data-testid="dashboard">
@@ -50,6 +55,27 @@ export default function Dashboard() {
           Olá, {firstName}!
         </h1>
         <p className="mt-1 text-muted-foreground">Continue sua preparação para a ONEE.</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="rounded-2xl border border-border bg-card p-4" data-testid="stat-xp">
+          <p className="flex items-center gap-1.5 text-xs text-muted-foreground"><Zap className="h-3.5 w-3.5" /> XP</p>
+          <p className="mt-1 font-display text-xl font-extrabold text-foreground sm:text-2xl">{xp}</p>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-4" data-testid="stat-level">
+          <p className="text-xs text-muted-foreground">Nível</p>
+          <p className="mt-1 truncate font-display text-xl font-extrabold text-foreground sm:text-2xl">{level.name}</p>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-4" data-testid="stat-streak">
+          <p className="flex items-center gap-1.5 text-xs text-muted-foreground"><Flame className="h-3.5 w-3.5" /> Sequência</p>
+          <p className="mt-1 font-display text-xl font-extrabold text-foreground sm:text-2xl">
+            {streak} {streak === 1 ? "dia" : "dias"}
+          </p>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-4" data-testid="stat-simulados">
+          <p className="text-xs text-muted-foreground">Simulados</p>
+          <p className="mt-1 font-display text-xl font-extrabold text-foreground sm:text-2xl">{simuladosCount}</p>
+        </div>
       </div>
 
       <div className="rounded-2xl border border-border bg-card p-6 sm:p-7" data-testid="progress-card">
@@ -68,14 +94,19 @@ export default function Dashboard() {
           Você já concluiu {completed.length} de {TOTAL_LESSONS} atividades.
         </p>
         {next && (
-          <Link
-            to={`/curso/modulo/${next.module.id}`}
-            className="group mt-5 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 font-display text-sm font-bold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-volt hover:text-ink"
-            data-testid="continue-studying-button"
-          >
-            Continuar estudando
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </Link>
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <Link
+              to={`/curso/modulo/${next.module.id}/aula/${next.lesson.id}`}
+              className="group inline-flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 font-display text-sm font-bold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-volt hover:text-ink"
+              data-testid="continue-studying-button"
+            >
+              Continuar estudando
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+            <p className="text-sm text-muted-foreground">
+              Próxima aula: <strong className="text-foreground">{next.lesson.title}</strong> — {next.module.title}
+            </p>
+          </div>
         )}
       </div>
 

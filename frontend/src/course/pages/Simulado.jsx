@@ -66,7 +66,7 @@ export default function Simulado() {
           Simulado ONEE
         </h1>
         <p className="text-muted-foreground">
-          {SIMULADO_QUESTIONS.length} questões • {DURATION / 60} minutos • cada acerto vale 10 XP.
+          {SIMULADO_QUESTIONS.length} questões • {DURATION / 60} minutos • +100 XP ao concluir, mais 10 XP por acerto.
           Treine como se fosse o dia da prova.
         </p>
         <button
@@ -97,7 +97,7 @@ export default function Simulado() {
               ? "Bom começo. Revise os módulos e tente de novo."
               : "Hora de revisar o conteúdo — os flashcards podem ajudar."}
         </p>
-        <p className="font-display text-lg font-bold text-foreground">+{score * 10} XP</p>
+        <p className="font-display text-lg font-bold text-foreground">+{100 + score * 10} XP</p>
         <div className="space-y-3 pt-2 text-left">
           {SIMULADO_QUESTIONS.map((q, i) => (
             <div

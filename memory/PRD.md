@@ -49,6 +49,17 @@ Landing page moderna, profissional e persuasiva para o produto educacional "Desa
 - Professor IA continua como botão flutuante global; item "Professor IA" na sidebar abre o chat via evento.
 - Liberação por pagamento (API Cakto) NÃO implementada ainda — qualquer usuário logado acessa /curso.
 
+## Atualização 2026-09-05 (v5) — Reformulação pedagógica completa
+- Nova arquitetura de conteúdo por blocos (escalável): aulas = sequência de blocos (intro, concept, law, examples, units, compare, formgrid, flow, lampdemo, picker, keypoints, map, mistakes, minichallenge, identify, quickcheck, checklist, quiz). Renderer genérico em src/course/components/blocks.jsx — novos módulos são só dados.
+- Módulo 1 (Fundamentos da Energia) reescrito por completo com 6 aulas ricas em src/course/data/module1.js: conceito explicado de verdade, Lei da Conservação, J vs kWh, demo interativa da lâmpada, grade das 8 formas, jogo "identifique a forma" (6 rodadas com feedback), comparador forma vs fonte, explorador de fontes (6 fontes com o que é/como funciona/onde/vantagens/limitações), 4 cadeias de transformação animadas (chuveiro, celular, painel solar, carro), revisão interativa (resumo, mapa visual, erros comuns, perguntas rápidas, checklist obrigatório) e quiz de 8 questões com explicação por questão + botão "Por que errei?" (abre Professor com contexto).
+- Nova página de aula /curso/modulo/:id/aula/:lessonId: progresso da aula + do módulo, objetivo de aprendizagem, revelação progressiva de blocos, interações bloqueiam o avanço até responder, conclusão com +25 XP, navegação anterior/próxima, quiz bloqueado até concluir as aulas do módulo.
+- Animações agora são pedagógicas (causa→transformação→resultado): fluxo com brilho sequencial e demo da lâmpada ligável; respeitam prefers-reduced-motion.
+- XP reformulado (backend): +5 login diário, +25 aula, +10/questão correta de quiz, +100 simulado + 10/acerto; activity_dates para sequência de estudos. Níveis: Tomada → Lâmpada → Gerador → Usina → Mestre da Energia (data/gamification.js).
+- Dashboard: cards de XP, nível, sequência e simulados; "Continuar estudando" leva direto à próxima aula incompleta.
+- Professor IA vira tutor: chips "Não entendi / Explique de outra forma / Me dê uma dica / Me dê outro exemplo", contexto da questão enviado ao backend, prompt orienta a ensinar sem entregar a resposta.
+- Módulos 2–7 mantidos no formato anterior (intro+pontos), renderizados pelo mesmo LessonPage via conversão automática de blocos.
+- Verificado e2e: aula concluída com +25 XP, minichallenge bloqueia avanço, jogo identificar com erro→explicação→retry, picker de fontes, quiz bloqueado até completar aulas, mobile sem overflow, dashboard com novos stats.
+
 ## Pendências / NÃO implementado
 - Envio real do checklist por e-mail (leads ficam salvos; a mensagem de sucesso menciona e-mail — envio depende de integração futura com e-mail marketing).
 - Checkout real (ambos os botões do upsell apontam para placeholders Hotmart — substituir pelas URLs reais dos dois produtos).
