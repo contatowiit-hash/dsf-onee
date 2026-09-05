@@ -1,7 +1,8 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
+from openai import AsyncOpenAI
 import os
 import logging
 import uuid
@@ -16,6 +17,21 @@ load_dotenv(ROOT_DIR / '.env')
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
+
+groq_client = AsyncOpenAI(
+    api_key=os.environ["GROQ_API_KEY"],
+    base_url="https://api.groq.com/openai/v1",
+)
+
+PROFESSOR_SYSTEM_PROMPT = (
+    "Você é o Professor ONEE, um professor virtual especializado em energia elétrica e "
+    "eficiência energética para estudantes do 8º e 9º ano do Ensino Fundamental que se "
+    "preparam para a Olimpíada Nacional de Eficiência Energética. Responda sempre em "
+    "português do Brasil, com linguagem simples, didática e encorajadora. Seja direto: "
+    "respostas com no máximo 120 palavras. Use exemplos do dia a dia (conta de luz, "
+    "chuveiro elétrico, geladeira, lâmpadas). Se a pergunta não tiver relação com estudos, "
+    "energia ou ciências, redirecione educadamente para o tema da olimpíada."
+)
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
@@ -52,6 +68,38 @@ async def create_lead(input: LeadCreate):
 @api_router.get("/leads/count")
 async def leads_count():
     return {"count": await db.leads.count_documents({})}
+
+
+class ProfessorMessage(BaseModel):
+    message: str
+    session_id: Optional[str] = None
+
+
+@api_router.post("/professor")
+async def professor(input: ProfessorMessage):
+    text = input.message.strip()[:600]
+    if not text:
+        raise HTTPException(status_code=400, detail="Mensagem vazia.")
+    session_id = input.session_id or str(uuid.uuid4())
+    history = await db.professor_chats.find(
+        {"session_id": session_id}, {"_id": 0}
+    ).sort("created_at", 1).to_list(24)
+    messages = [{"role": "system", "content": PROFESSOR_SYSTEM_PROMPT}]
+    messages += [{"role": h["role"], "content": h["content"]} for h in history[-12:]]
+    messages.append({"role": "user", "content": text})
+    completion = await groq_client.chat.completions.create(
+        model="openai/gpt-oss-120b",
+        messages=messages,
+        max_tokens=400,
+        temperature=0.6,
+    )
+    reply = completion.choices[0].message.content.strip()
+    now = datetime.now(timezone.utc).isoformat()
+    await db.professor_chats.insert_many([
+        {"session_id": session_id, "role": "user", "content": text, "created_at": now},
+        {"session_id": session_id, "role": "assistant", "content": reply, "created_at": now},
+    ])
+    return {"reply": reply, "session_id": session_id}
 
 
 app.include_router(api_router)

@@ -27,16 +27,24 @@ Landing page moderna, profissional e persuasiva para o produto educacional "Desa
 
 ## Verificado
 - curl: POST /api/leads (novo, duplicado, e-mail inválido 422), GET /api/leads/count.
+- curl: POST /api/professor (resposta didática em pt-BR via Groq, session_id persistido).
 - Screenshot e2e: hero, navegação por âncoras, envio do formulário com mensagem de sucesso, oferta, FAQ, CTA final, menu mobile hamburger, sem overflow horizontal.
+- Screenshot e2e: modal de upsell abre ao clicar em COMEÇAR AGORA (bug de contraste do título corrigido), widget do Professor IA responde pergunta real.
+
+## Atualização 2026-09-05 (v2)
+- Preço base alterado para R$ 19,90 (plano Essencial).
+- Upsell no clique de pagar: modal com Essencial (R$ 19,90) vs Completo (R$ 27,93, inclui Professor IA). Links de checkout placeholder separados por plano (em UpsellModal.jsx).
+- Professor IA: widget flutuante de chat (Groq API, modelo openai/gpt-oss-120b — llama-3.3-70b-versatile foi descontinuado pela Groq), endpoint POST /api/professor, histórico por sessão salvo em db.professor_chats. Chave GROQ_API_KEY no backend/.env (nunca exposta no frontend).
 
 ## Pendências / NÃO implementado
 - Envio real do checklist por e-mail (leads ficam salvos; a mensagem de sucesso menciona e-mail — envio depende de integração futura com e-mail marketing).
-- Checkout real (botão aponta para placeholder Hotmart — substituir pela URL real).
+- Checkout real (ambos os botões do upsell apontam para placeholders Hotmart — substituir pelas URLs reais dos dois produtos).
 - Exportação/visualização dos leads capturados (não há tela admin).
+- Chat do Professor IA não é streaming (resposta chega de uma vez — Groq é rápido; evoluir para SSE se desejado).
 
 ## Backlog priorizado
-- P0: Trocar CHECKOUT_URL pelo link real de pagamento (Hotmart/Kiwify).
+- P0: Trocar os 2 links de checkout do upsell pelos links reais (Hotmart/Kiwify) dos planos Essencial e Completo.
 - P0: Integrar ferramenta de e-mail marketing para enviar o checklist automaticamente.
 - P1: Página/endpoint admin simples para exportar leads (CSV).
-- P1: Assistente de estudos com IA (Grok) quando o usuário obtiver a chave de API.
+- P1: Liberar o Professor IA completo só para compradores do plano Completo (hoje é demonstração aberta).
 - P2: Pixel de conversão (Meta/Google Ads) e OG image.

@@ -1,7 +1,7 @@
+import { useState } from "react";
 import { Zap, Check, ShieldCheck } from "lucide-react";
 import { Reveal, Chapter } from "@/components/Reveal";
-
-const CHECKOUT_URL = "https://pay.hotmart.com/placeholder-desafio-onee";
+import UpsellModal from "@/components/UpsellModal";
 
 const INCLUDED = [
   "Aulas objetivas",
@@ -9,10 +9,10 @@ const INCLUDED = [
   "Banco de questões",
   "Simulados",
   "Gabaritos comentados",
-  "Assistência profissional para dúvidas",
 ];
 
 export default function Offer() {
+  const [upsellOpen, setUpsellOpen] = useState(false);
   return (
     <section id="oferta" className="scroll-mt-20 bg-ink py-16 text-white sm:py-24 lg:py-32" data-testid="offer-section">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -60,23 +60,21 @@ export default function Offer() {
               </p>
               <div className="mt-5 flex items-end gap-3">
                 <span className="font-display text-6xl font-extrabold tracking-tight text-volt sm:text-7xl">
-                  R$ 27<span className="text-4xl sm:text-5xl">,93</span>
+                  R$ 19<span className="text-4xl sm:text-5xl">,90</span>
                 </span>
               </div>
               <p className="mt-3 text-sm text-slate-400 sm:text-base">
                 Pagamento único • Acesso imediato • Valor promocional de lançamento
               </p>
 
-              <a
-                href={CHECKOUT_URL}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => setUpsellOpen(true)}
                 data-testid="offer-checkout-button"
-                className="pulse-glow group mt-8 flex items-center justify-center gap-2.5 rounded-full bg-volt px-8 py-4 font-display text-lg font-extrabold text-ink transition-all duration-200 hover:-translate-y-1 hover:bg-bolt active:translate-y-0 active:scale-[0.97]"
+                className="pulse-glow group mt-8 flex w-full items-center justify-center gap-2.5 rounded-full bg-volt px-8 py-4 font-display text-lg font-extrabold text-ink transition-all duration-200 hover:-translate-y-1 hover:bg-bolt active:translate-y-0 active:scale-[0.97]"
               >
                 COMEÇAR AGORA
                 <Zap className="h-5 w-5 transition-transform duration-200 group-hover:rotate-12" fill="currentColor" />
-              </a>
+              </button>
 
               <p className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-400 sm:text-sm" data-testid="offer-guarantee">
                 <ShieldCheck className="h-4 w-4 shrink-0 text-volt" />
@@ -86,6 +84,7 @@ export default function Offer() {
           </Reveal>
         </div>
       </div>
+      <UpsellModal open={upsellOpen} onClose={() => setUpsellOpen(false)} />
     </section>
   );
 }

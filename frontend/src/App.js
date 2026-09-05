@@ -13,6 +13,7 @@ import Offer from "@/components/Offer";
 import Faq from "@/components/Faq";
 import FinalCta from "@/components/FinalCta";
 import Footer from "@/components/Footer";
+import ProfessorWidget from "@/components/ProfessorWidget";
 
 export default function App() {
   useEffect(() => {
@@ -57,6 +58,7 @@ export default function App() {
         <FinalCta />
       </main>
       <Footer />
+      <ProfessorWidget />
     </div>
   );
 }
