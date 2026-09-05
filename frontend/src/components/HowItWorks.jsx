@@ -23,7 +23,7 @@ export default function HowItWorks() {
     <section id="como-funciona" className="scroll-mt-20 bg-ink py-16 text-white sm:py-24 lg:py-32" data-testid="how-it-works-section">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <Chapter index="CAP. 03" label="Como Funciona" dark />
+          <Chapter label="Como funciona" dark />
         </Reveal>
         <Reveal delay={0.08}>
           <h2 className="mt-6 max-w-2xl font-display text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">

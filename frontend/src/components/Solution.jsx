@@ -15,12 +15,12 @@ export default function Solution() {
     <section id="solucao" className="scroll-mt-20 bg-[#F3F4F0] py-16 sm:py-24 lg:py-32" data-testid="solution-section">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <Chapter index="CAP. 02" label="A Solução" />
+          <Chapter label="A solução" />
         </Reveal>
         <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
           <Reveal delay={0.08}>
             <h2 className="max-w-2xl font-display text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
-              Um caminho simples para <span className="relative inline-block">estudar melhor.<span aria-hidden="true" className="absolute inset-x-0 bottom-1 -z-10 h-3 -rotate-1 rounded-sm bg-volt" /></span>
+              Um caminho simples para estudar melhor.
             </h2>
           </Reveal>
           <Reveal delay={0.14}>

@@ -78,6 +78,19 @@ html.lenis {
     color: transparent;
 }
 
+:focus-visible {
+    outline: 2px solid #0b0f17;
+    outline-offset: 3px;
+    border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .marquee-track,
+    .pulse-glow {
+        animation: none;
+    }
+}
+
 @layer base {
     [data-debug-wrapper="true"] {
         display: contents !important;

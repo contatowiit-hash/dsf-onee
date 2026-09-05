@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import "@/App.css";
 import Lenis from "lenis";
+import { MotionConfig } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Marquee from "@/components/Marquee";
@@ -43,7 +44,8 @@ export default function App() {
   }, []);
 
   return (
-    <div className="bg-paper text-ink overflow-x-clip">
+    <MotionConfig reducedMotion="user">
+      <div className="bg-paper text-ink overflow-x-clip">
       <Navbar />
       <main>
         <Hero />
@@ -59,6 +61,7 @@ export default function App() {
       </main>
       <Footer />
       <ProfessorWidget />
-    </div>
+      </div>
+    </MotionConfig>
   );
 }

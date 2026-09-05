@@ -39,7 +39,7 @@ export default function Faq() {
         <div className="grid gap-12 lg:grid-cols-[1fr_1.4fr]">
           <div>
             <Reveal>
-              <Chapter index="CAP. 06" label="FAQ" />
+              <Chapter label="Dúvidas frequentes" />
             </Reveal>
             <Reveal delay={0.08}>
               <h2 className="mt-6 font-display text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">

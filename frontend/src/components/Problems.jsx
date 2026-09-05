@@ -30,7 +30,7 @@ export default function Problems() {
     <section id="problema" className="scroll-mt-20 py-16 sm:py-24 lg:py-32" data-testid="problems-section">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <Chapter index="CAP. 01" label="O Problema" />
+          <Chapter label="O problema" />
         </Reveal>
         <Reveal delay={0.08}>
           <h2 className="mt-6 max-w-2xl font-display text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">
@@ -54,9 +54,6 @@ export default function Problems() {
                 <div className="flex items-start justify-between">
                   <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-ink text-volt transition-colors duration-300 group-hover:bg-volt group-hover:text-ink">
                     <problem.icon className="h-6 w-6" />
-                  </span>
-                  <span className="font-mono text-sm font-bold tracking-[0.2em] text-slate-300 transition-colors duration-300 group-hover:text-ink">
-                    {problem.number}
                   </span>
                 </div>
                 <h3 className="mt-6 font-display text-lg font-bold leading-snug sm:text-xl">

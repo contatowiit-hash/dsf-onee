@@ -36,6 +36,13 @@ Landing page moderna, profissional e persuasiva para o produto educacional "Desa
 - Upsell no clique de pagar: modal com Essencial (R$ 19,90) vs Completo (R$ 27,93, inclui Professor IA). Links de checkout placeholder separados por plano (em UpsellModal.jsx).
 - Professor IA: widget flutuante de chat (Groq API, modelo openai/gpt-oss-120b — llama-3.3-70b-versatile foi descontinuado pela Groq), endpoint POST /api/professor, histórico por sessão salvo em db.professor_chats. Chave GROQ_API_KEY no backend/.env (nunca exposta no frontend).
 
+## Atualização 2026-09-05 (v3) — skill frontend-design (anthropics/skills)
+- Removidos "tells" de template: etiquetas de seção em CAIXA ALTA mono com em dash viraram marcador discreto (quadrado volt + label em sentence case).
+- Numeração 01/02/03 removida da seção Problema (conteúdo não é sequência); mantida em Como Funciona (sequência real).
+- Destaque volt em palavra única de título agora existe só no hero (momento assinatura); demais títulos limpos.
+- Seta decorativa removida dos cards de conteúdo (não são clicáveis).
+- Acessibilidade: MotionConfig reducedMotion="user" + CSS prefers-reduced-motion (marquee/pulse), :focus-visible visível, selo do hero compactado no mobile.
+
 ## Pendências / NÃO implementado
 - Envio real do checklist por e-mail (leads ficam salvos; a mensagem de sucesso menciona e-mail — envio depende de integração futura com e-mail marketing).
 - Checkout real (ambos os botões do upsell apontam para placeholders Hotmart — substituir pelas URLs reais dos dois produtos).

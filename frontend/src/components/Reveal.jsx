@@ -14,21 +14,10 @@ export const Reveal = ({ children, delay = 0, y = 28, className = "" }) => (
   </motion.div>
 );
 
-export const Chapter = ({ index, label, dark = false }) => (
-  <div className="flex items-center gap-3" data-testid={`chapter-${index}`}>
-    <span
-      className={`font-mono text-xs font-bold tracking-[0.25em] uppercase ${
-        dark ? "text-volt" : "text-ink"
-      }`}
-    >
-      {index}
-    </span>
-    <span className={`h-px w-10 ${dark ? "bg-volt/50" : "bg-ink/30"}`} />
-    <span
-      className={`font-mono text-xs font-bold tracking-[0.25em] uppercase ${
-        dark ? "text-white/60" : "text-slate-500"
-      }`}
-    >
+export const Chapter = ({ label, dark = false }) => (
+  <div className="flex items-center gap-2.5" data-testid={`chapter-${label.toLowerCase().replace(/\s+/g, "-")}`}>
+    <span className="h-2.5 w-2.5 rounded-[3px] bg-volt ring-1 ring-ink/10" />
+    <span className={`text-sm font-semibold ${dark ? "text-slate-400" : "text-slate-500"}`}>
       {label}
     </span>
   </div>

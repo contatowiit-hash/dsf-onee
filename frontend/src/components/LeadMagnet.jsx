@@ -39,7 +39,7 @@ export default function LeadMagnet() {
               Material gratuito
             </span>
             <h2 className="mt-6 font-display text-3xl font-extrabold tracking-tight text-ink sm:text-4xl lg:text-5xl">
-              Quer começar <span className="underline decoration-ink/30 decoration-4 underline-offset-8">de graça?</span>
+              Quer começar de graça?
             </h2>
             <p className="mt-5 max-w-md text-base leading-relaxed text-ink/70 sm:text-lg">
               Baixe o <strong className="text-ink">Checklist de Estudos ONEE</strong> e descubra os

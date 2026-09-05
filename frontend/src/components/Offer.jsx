@@ -17,7 +17,7 @@ export default function Offer() {
     <section id="oferta" className="scroll-mt-20 bg-ink py-16 text-white sm:py-24 lg:py-32" data-testid="offer-section">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <Chapter index="CAP. 05" label="A Oferta" dark />
+          <Chapter label="A oferta" dark />
         </Reveal>
 
         <div className="mt-10 grid items-center gap-14 lg:grid-cols-2">

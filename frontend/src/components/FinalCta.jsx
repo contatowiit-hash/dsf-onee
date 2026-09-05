@@ -11,7 +11,7 @@ export default function FinalCta() {
       <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
         <Reveal>
           <h2 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-            Pare de estudar <span className="relative inline-block">no aleatório.<span aria-hidden="true" className="absolute inset-x-0 bottom-1 -z-10 h-4 -rotate-1 rounded-sm bg-volt" /></span>
+            Pare de estudar no aleatório.
           </h2>
         </Reveal>
         <Reveal delay={0.1}>

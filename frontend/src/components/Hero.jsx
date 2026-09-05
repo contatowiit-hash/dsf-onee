@@ -151,7 +151,7 @@ export default function Hero() {
           <span className="flex h-6 w-6 items-center justify-center rounded-full bg-volt">
             <Zap className="h-3.5 w-3.5 text-ink" fill="currentColor" />
           </span>
-          <span className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-ink">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-ink sm:text-[11px] sm:tracking-[0.18em]">
             Preparação independente • 8º e 9º ano
           </span>
         </motion.div>

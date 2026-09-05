@@ -47,7 +47,7 @@ export default function UpsellModal({ open, onClose }) {
               Antes de finalizar
             </p>
             <h3 className="mt-2 font-display text-2xl font-extrabold tracking-tight sm:text-3xl">
-              Como você quer <span className="relative inline-block">se preparar?<span aria-hidden="true" className="absolute inset-x-0 bottom-0.5 -z-10 h-2.5 -rotate-1 rounded-sm bg-volt" /></span>
+              Como você quer se preparar?
             </h3>
 
             <div className="mt-7 grid gap-5 sm:grid-cols-2">

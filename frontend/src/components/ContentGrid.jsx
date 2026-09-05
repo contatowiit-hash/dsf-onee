@@ -1,5 +1,4 @@
 import { Reveal, Chapter } from "@/components/Reveal";
-import { ArrowUpRight } from "lucide-react";
 
 const TOPICS = [
   "Energia elétrica",
@@ -18,7 +17,7 @@ export default function ContentGrid() {
     <section id="conteudo" className="scroll-mt-20 py-16 sm:py-24 lg:py-32" data-testid="content-section">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <Chapter index="CAP. 04" label="Conteúdo" />
+          <Chapter label="Conteúdo" />
         </Reveal>
         <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
           <Reveal delay={0.08}>
@@ -49,7 +48,6 @@ export default function ContentGrid() {
                     {topic}
                   </h3>
                 </div>
-                <ArrowUpRight className="h-5 w-5 shrink-0 text-slate-300 transition-all duration-300 group-hover:rotate-45 group-hover:text-volt" />
               </article>
             </Reveal>
           ))}
