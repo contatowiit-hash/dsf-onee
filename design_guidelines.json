@@ -1,0 +1,266 @@
+{
+  "project_name": "Desafio ONEE - Prep Landing Page",
+  "app_type": "landing_page",
+  "target_audience": "Estudantes do 8º e 9º ano do Ensino Fundamental e seus responsáveis (pais)",
+  "language": "pt-BR",
+  "archetype": "THE PERFORMANCE PRO / ENERGETIC EDTECH",
+  "theme": {
+    "mode": "light_dominant_with_electric_accents",
+    "background_base": "#FAFAF8",
+    "surface_card": "#FFFFFF",
+    "surface_secondary": "#F3F4F0",
+    "text_primary": "#0B1120",
+    "text_secondary": "#475569",
+    "text_muted": "#64748B",
+    "accent_volt_green": "#CCFF00",
+    "accent_electric_yellow": "#FFE600",
+    "accent_cyber_cyan": "#00E5FF",
+    "accent_dark_obsidian": "#0B0F17",
+    "border_light": "#E2E8F0",
+    "border_dark_contrast": "#1E293B",
+    "forbidden_colors": ["#7351B7", "#1B93A4", "purple gradients on white"],
+    "rule": "90% Light crisp substrate with Obsidian structure and high-visibility Electric Volt (#CCFF00/#FFE600) trigger highlights."
+  },
+  "typography": {
+    "fonts": {
+      "heading": "Plus Jakarta Sans, Outfit, sans-serif",
+      "body": "DM Sans, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "hierarchy": {
+      "hero_h1": "text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.08]",
+      "section_h2": "text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[#0B1120]",
+      "subsection_h3": "text-xl sm:text-2xl font-semibold tracking-tight text-[#0B1120]",
+      "card_title": "text-lg sm:text-xl font-bold text-[#0B1120]",
+      "body_text": "text-base sm:text-lg leading-relaxed text-[#475569]",
+      "caption_mono": "font-mono text-xs uppercase tracking-[0.2em] font-bold text-[#0B1120]"
+    },
+    "forbidden_fonts": ["Inter for headings", "Roboto", "Space Grotesk"]
+  },
+  "layout_and_spacing": {
+    "container_max_width": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "section_padding": "py-16 sm:py-24 lg:py-32",
+    "bento_grid_mode": "TETRIS GRID (Asymmetrical 12-column with high contrast card spans)",
+    "gap": "gap-6 sm:gap-8",
+    "radius_system": "rounded-2xl for main cards, rounded-xl for inner elements, rounded-full for badges and buttons"
+  },
+  "components_and_sections": [
+    {
+      "id": "navigation",
+      "name": "Header & Sticky Navigation Bar",
+      "style": "Glassmorphism light mode (bg-white/85 backdrop-blur-xl border-b border-slate-200/80 z-50 fixed top-0 inset-x-0)",
+      "elements": [
+        "Brand logo text 'DESAFIO ONEE ⚡' (font-black, tracking-tight)",
+        "Desktop Anchor Links: 'Problema', 'Como Funciona', 'Conteúdo', 'Oferta', 'FAQ'",
+        "CTA Button: 'QUERO COMEÇAR ⚡' (data-testid='nav-cta-button')"
+      ]
+    },
+    {
+      "id": "hero",
+      "name": "Hero Section",
+      "headline": "Prepare-se para a ONEE sem estudar no escuro. ⚡",
+      "subheadline": "Material direto ao ponto, listas de exercícios práticos e simulados focados na Olimpíada Nacional de Eficiência Energética para alunos do 8º e 9º ano.",
+      "ctas": [
+        {
+          "label": "QUERO ME PREPARAR ⚡",
+          "target": "#oferta",
+          "data_testid": "hero-primary-cta"
+        },
+        {
+          "label": "VER COMO FUNCIONA",
+          "target": "#como-funciona",
+          "data_testid": "hero-secondary-cta"
+        }
+      ],
+      "visual_moment": "Interactive 3D / Canvas Electric Energy Sphere / Particles with line-by-line reveal motion",
+      "social_proof_badge": "Preparação independente e focada no resultado | Edição 2026"
+    },
+    {
+      "id": "editorial_marquee",
+      "name": "Kinetic Editorial Marquee",
+      "content": ["EFICIÊNCIA ENERGÉTICA", "FÍSICA APLICADA", "CONSUMO CONSCIENTE", "MATRIZ ELÉTRICA", "SIMULADOS PRÁTICOS", "REVISÃO FOCADA"],
+      "speed": "very slow smooth drift"
+    },
+    {
+      "id": "problema",
+      "name": "Seção Problema - Você sabe exatamente o que estudar?",
+      "subtitle": "Os 3 maiores obstáculos dos estudantes no exame da ONEE",
+      "cards": [
+        {
+          "number": "01",
+          "title": "Excesso de conteúdo disperso",
+          "description": "Internet cheia de artigos genéricos sobre energia que não caem nas questões reais da prova."
+        },
+        {
+          "number": "02",
+          "title": "Falta de simulados práticos",
+          "description": "Dificuldade em medir o tempo de resolução e testar raciocínio sob pressão de prova."
+        },
+        {
+          "number": "03",
+          "title": "Ansiedade por não ter cronograma",
+          "description": "Estudar 'no aleatório' gera sensação constante de estar atrasado ou esquecendo matérias chave."
+        }
+      ]
+    },
+    {
+      "id": "solucao",
+      "name": "Seção Solução - Um caminho simples para estudar melhor",
+      "cards_6_benefits": [
+        "Cronograma Objetivo de 4 Semanas",
+        "Resumos Descomplicados de Física e Energia",
+        "150+ Questões Comentadas Passo a Passo",
+        "Simulados no Formato Oficial da ONEE",
+        "Guia Prático de Cálculo de kWh e Tarifas",
+        "Acesso Vitalício no Celular ou Computador"
+      ]
+    },
+    {
+      "id": "como_funciona",
+      "name": "Seção Como Funciona em 3 Passos",
+      "steps": [
+        {
+          "step": "01",
+          "title": "Aprenda",
+          "desc": "Acesse os módulos resumidos com teoria direto ao ponto e mapas mentais."
+        },
+        {
+          "step": "02",
+          "title": "Pratique",
+          "desc": "Resolva listas de exercícios divididas por nível de dificuldade com gabarito explicativo."
+        },
+        {
+          "step": "03",
+          "title": "Simule",
+          "desc": "Faça simulados cronometrados para testar seu desempenho antes do dia oficial."
+        }
+      ]
+    },
+    {
+      "id": "conteudo",
+      "name": "Seção Grade de Conteúdo - O que você vai estudar",
+      "cards_9_topics": [
+        {"title": "1. Eficiência Energética", "tag": "Módulo 1", "desc": "Conceitos fundamentais, desperdício e hábitos sustentáveis."},
+        {"title": "2. Fontes Renováveis vs Não Renováveis", "tag": "Módulo 2", "desc": "Solar, eólica, hídrica, biomassa, fóseis e impactos ambiental."},
+        {"title": "3. Matriz Elétrica Brasileira", "tag": "Módulo 3", "desc": "Como funciona o sistema interligado nacional e geração."},
+        {"title": "4. Leis da Física & Transformação de Energia", "tag": "Módulo 4", "desc": "Conservação de energia, potência e efeito Joule de forma simples."},
+        {"title": "5. Cálculo de Consumo kWh", "tag": "Módulo 5", "desc": "Fórmulas práticas para calcular o custo de eletrodomésticos."},
+        {"title": "6. Bandeiras Tarifárias & Selo Procel", "tag": "Módulo 6", "desc": "Identificação de eficiência e leitura de faturas de energia."},
+        {"title": "7. Conservação & Meio Ambiente", "tag": "Módulo 7", "desc": "Redução da pegada de carbono e metas globais de sustentabilidade."},
+        {"title": "8. Tecnologia, Smart Grids & Inovação", "tag": "Módulo 8", "desc": "Redes inteligentes, mobilidade elétrica e armazenamento."},
+        {"title": "9. Simulado Final Comentado", "tag": "Módulo 9", "desc": "30 questões estilo olimpíada para revisão completa de alta retenção."}
+      ]
+    },
+    {
+      "id": "lead_magnet",
+      "name": "Seção Lead Magnet - Quer começar de graça?",
+      "headline": "Baixe o Guia Rápido de Fórmulas e Conceitos Chave",
+      "description": "Receba instantaneamente no seu e-mail um resumo em PDF com os conceitos que mais caem na ONEE.",
+      "form": {
+        "api_endpoint": "/api/leads",
+        "inputs": [
+          {"name": "name", "type": "text", "placeholder": "Seu nome completo", "data_testid": "lead-name-input"},
+          {"name": "email", "type": "email", "placeholder": "Seu melhor e-mail", "data_testid": "lead-email-input"}
+        ],
+        "submit_button": {
+          "label": "RECEBER MATERIAL GRATUITO ⚡",
+          "data_testid": "lead-submit-button"
+        },
+        "success_message": "Sucesso! O Guia Rápido foi enviado para o seu e-mail e salvo com sucesso."
+      }
+    },
+    {
+      "id": "oferta",
+      "name": "Seção Oferta Principal",
+      "headline": "Quer estudar com tudo organizado?",
+      "price": "R$ 27,93",
+      "payment_subtitle": "Pagamento único | Acesso imediato",
+      "included_items": [
+        "Acesso completo ao Guia de Estudo Desafio ONEE",
+        "150+ Questões Comentadas e Organizadas por Tópico",
+        "3 Simulados Exclusivos com Gabarito Detalhado",
+        "Plano de Estudos em 4 Semanas (PDF interativo)",
+        "Suporte direto para dúvidas com a equipe via e-mail"
+      ],
+      "checkout_cta": {
+        "label": "COMEÇAR AGORA ⚡",
+        "url": "https://pay.hotmart.com/placeholder-desafio-onee",
+        "data_testid": "offer-checkout-button"
+      },
+      "guarantee": "Satisfação garantida ou seu dinheiro de volta em até 7 dias."
+    },
+    {
+      "id": "faq",
+      "name": "Seção Perguntas Frequentes (FAQ)",
+      "questions": [
+        {
+          "q": "O Desafio ONEE é oficial da ANEEL ou da organização da ONEE?",
+          "a": "Não. O Desafio ONEE é um preparatório educacional 100% independente criado para ajudar os alunos a estudarem e revisarem os conteúdos exigidos."
+        },
+        {
+          "q": "Para quem é indicado este material?",
+          "a": "Para estudantes do 8º e 9º ano do Ensino Fundamental que querem se preparar com antecedência e responsabilidade para a Olimpíada Nacional de Eficiência Energética."
+        },
+        {
+          "q": "Como recebo o acesso ao material?",
+          "a": "Logo após a confirmação do pagamento, você receberá um e-mail com o link direto e senha de acesso ao portal do aluno com todos os PDFs e listas interativas."
+        },
+        {
+          "q": "Garante medalha ou aprovação na olimpíada?",
+          "a": "Não. Não é possível prometer resultados ou medalhas, pois o desempenho depende do dedicação individual de cada estudante. Nosso objetivo é fornecer o melhor material estruturado de apoio."
+        },
+        {
+          "q": "Os pais podem acompanhar os estudos?",
+          "a": "Sim! O cronograma de 4 semanas foi feito para que pais e professores possam acompanhar a evolução dos alunos facilmente."
+        },
+        {
+          "q": "Quais são as formas de pagamento?",
+          "a": "Cartão de crédito, PIX com liberação imediata ou boleto bancário através de plataforma segura."
+        }
+      ]
+    },
+    {
+      "id": "cta_final",
+      "name": "Seção Call To Action Final",
+      "headline": "Pare de estudar no aleatório.",
+      "subheadline": "Garanta agora seu acesso ao preparatório organizado pelo valor de lançamento.",
+      "cta": {
+        "label": "QUERO COMEÇAR ⚡",
+        "target": "#oferta",
+        "data_testid": "final-cta-button"
+      }
+    },
+    {
+      "id": "footer",
+      "name": "Footer Institucional",
+      "disclaimer": "Aviso Legal: O Desafio ONEE é um curso preparatório independente. Não possui vínculo oficial, associação ou endosso de órgãos governamentais, ANEEL ou organizadores da ONEE.",
+      "copyright": "© 2026 Desafio ONEE. Todos os direitos reservados."
+    }
+  ],
+  "motion_and_effects": {
+    "smooth_scroll": "Lenis smooth scrolling library enabled",
+    "animations": "Framer motion scroll reveal with staggered child entry and subtle scale-up",
+    "3d_hero_element": "Canvas with interactive rotating energy node mesh with electric particle glow",
+    "micro_interactions": "Hover elevation (-translate-y-1.5), active click pulse, high-contrast hover text"
+  },
+  "testing_requirements": {
+    "data_testids_required": [
+      "nav-cta-button",
+      "hero-primary-cta",
+      "hero-secondary-cta",
+      "lead-name-input",
+      "lead-email-input",
+      "lead-submit-button",
+      "offer-checkout-button",
+      "final-cta-button"
+    ]
+  },
+  "instructions_to_main_agent": [
+    "Build a pristine light-theme edtech landing page with obsidian structure and electric volt green highlights.",
+    "Strictly follow disclaimer guidelines: NO claim of being official ANEEL/ONEE, NO official logos, NO guaranteed medals/pass.",
+    "Implement the backend API route POST /api/leads in FastAPI (server.py) to save leads into SQLite database / memory and return clear status JSON.",
+    "Include Lenis smooth scrolling and Framer Motion reveal effects for high visual polish.",
+    "Ensure high legibility typography with Plus Jakarta Sans or Outfit for headlines and large, clear body text for parents and students.",
+    "Add test-id attributes (data-testid) to all interactive elements as defined."
+  ]
+}
