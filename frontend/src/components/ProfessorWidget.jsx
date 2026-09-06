@@ -1,10 +1,40 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
-import { GraduationCap, X, Send, Loader2, Lightbulb, MessageCircleQuestion, RefreshCw, Sparkles } from "lucide-react";
+import { GraduationCap, X, Send, Loader2, Lightbulb, MessageCircleQuestion, RefreshCw, Sparkles, Lock, Zap } from "lucide-react";
 import { EASE } from "@/components/Reveal";
+import { useAuth } from "@/context/AuthContext";
+import { CHECKOUT_COMPLETO } from "@/config/checkout";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+function ProfessorLocked() {
+  return (
+    <div className="flex flex-1 flex-col items-center justify-center gap-4 bg-paper px-6 py-8 text-center" data-testid="professor-locked">
+      <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-ink/5">
+        <Lock className="h-7 w-7 text-ink" />
+      </span>
+      <div>
+        <p className="font-display text-lg font-extrabold text-ink">
+          Professor IA é do plano Completo
+        </p>
+        <p className="mt-2 text-sm leading-relaxed text-slate-600">
+          Tenha um tutor de energia disponível 24h para tirar suas dúvidas, explicar de outro
+          jeito e te ajudar em cada questão. Faça o upgrade para o plano Completo.
+        </p>
+      </div>
+      <a
+        href={CHECKOUT_COMPLETO}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-testid="professor-locked-cta"
+        className="flex items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 font-display text-sm font-bold text-volt transition-transform hover:scale-[1.03] active:scale-95"
+      >
+        Liberar Professor IA — R$ 27,93 <Zap className="h-4 w-4" />
+      </a>
+    </div>
+  );
+}
 
 const SUGGESTIONS = [
   "O que é kWh?",
@@ -20,6 +50,8 @@ const TUTOR_CHIPS = [
 ];
 
 export default function ProfessorWidget() {
+  const { user } = useAuth();
+  const hasProfessor = !!user?.professor_access;
   const [open, setOpen] = useState(false);
   const [context, setContext] = useState(null);
   const [messages, setMessages] = useState([
@@ -58,7 +90,7 @@ export default function ProfessorWidget() {
         message: msg,
         session_id: sessionId,
         context,
-      });
+      }, { withCredentials: true });
       setSessionId(data.session_id);
       setMessages((m) => [...m, { role: "assistant", content: data.reply }]);
     } catch {
@@ -107,6 +139,10 @@ export default function ProfessorWidget() {
               </div>
             </div>
 
+            {!hasProfessor ? (
+              <ProfessorLocked />
+            ) : (
+            <>
             <div ref={listRef} className="flex-1 space-y-3 overflow-y-auto bg-paper px-4 py-4" data-testid="professor-messages">
               {messages.map((m, i) => (
                 <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -183,6 +219,8 @@ export default function ProfessorWidget() {
                 <Send className="h-4 w-4" />
               </button>
             </form>
+            </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

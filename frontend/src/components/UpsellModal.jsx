@@ -3,8 +3,8 @@ import { X, Zap, Check, GraduationCap, LogIn } from "lucide-react";
 import { EASE } from "@/components/Reveal";
 import { useAuth } from "@/context/AuthContext";
 
-const CHECKOUT_ESSENCIAL = "https://pay.hotmart.com/placeholder-desafio-onee-essencial";
-const CHECKOUT_COMPLETO = "https://pay.hotmart.com/placeholder-desafio-onee-completo";
+const CHECKOUT_ESSENCIAL = "https://pay.cakto.com.br/8mmd4nf_1086409";
+const CHECKOUT_COMPLETO = "https://pay.cakto.com.br/wjwzv8v_1086422";
 
 const ESSENCIAL_ITEMS = [
   "Aulas objetivas",

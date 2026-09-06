@@ -7,6 +7,7 @@ import httpx
 import os
 import logging
 import uuid
+from hmac import compare_digest
 from pathlib import Path
 from pydantic import BaseModel, EmailStr
 from typing import Optional
@@ -44,6 +45,72 @@ app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
 
+# ---------- Entitlements / Cakto ----------
+
+CAKTO_SECRETS = {
+    os.environ.get("CAKTO_SECRET_ESSENCIAL", "").strip(): "essencial",
+    os.environ.get("CAKTO_SECRET_COMPLETO", "").strip(): "completo",
+}
+PLAN_RANK = {"none": 0, "essencial": 1, "completo": 2}
+
+
+def _plan_for_secret(secret: str):
+    secret = (secret or "").strip()
+    if not secret:
+        return None
+    for s, plan in CAKTO_SECRETS.items():
+        if s and compare_digest(secret, s):
+            return plan
+    return None
+
+
+def _merge_plan(current, new):
+    current = current or "none"
+    if PLAN_RANK.get(new, 0) > PLAN_RANK.get(current, 0):
+        return new
+    return current
+
+
+def _with_flags(user):
+    plan = user.get("plan", "none") or "none"
+    user["plan"] = plan
+    user["has_access"] = plan in ("essencial", "completo")
+    user["professor_access"] = plan == "completo"
+    return user
+
+
+async def _grant_plan_to_user(email: str, plan: str) -> bool:
+    user = await db.users.find_one({"email": email}, {"_id": 0})
+    if not user:
+        return False
+    new_plan = _merge_plan(user.get("plan", "none"), plan)
+    await db.users.update_one({"email": email}, {"$set": {"plan": new_plan}})
+    return True
+
+
+async def _store_pending(email: str, plan: str):
+    pend = await db.pending_entitlements.find_one({"email": email}, {"_id": 0})
+    new_plan = _merge_plan(pend.get("plan") if pend else "none", plan)
+    await db.pending_entitlements.update_one(
+        {"email": email},
+        {"$set": {
+            "email": email,
+            "plan": new_plan,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }},
+        upsert=True,
+    )
+
+
+async def _claim_pending(email: str):
+    pend = await db.pending_entitlements.find_one({"email": email}, {"_id": 0})
+    if not pend:
+        return
+    granted = await _grant_plan_to_user(email, pend.get("plan", "none"))
+    if granted:
+        await db.pending_entitlements.delete_many({"email": email})
+
+
 class LeadCreate(BaseModel):
     email: EmailStr
     name: Optional[str] = None
@@ -77,6 +144,30 @@ async def leads_count():
     return {"count": await db.leads.count_documents({})}
 
 
+async def get_current_user(request: Request):
+    token = request.cookies.get("session_token")
+    auth = request.headers.get("Authorization")
+    if not token and auth and auth.startswith("Bearer "):
+        token = auth[7:]
+    if not token:
+        raise HTTPException(status_code=401, detail="Não autenticado.")
+    session = await db.user_sessions.find_one({"session_token": token}, {"_id": 0})
+    if not session:
+        raise HTTPException(status_code=401, detail="Sessão inválida.")
+    expires_at = session["expires_at"]
+    if isinstance(expires_at, str):
+        expires_at = datetime.fromisoformat(expires_at)
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    if expires_at < datetime.now(timezone.utc):
+        raise HTTPException(status_code=401, detail="Sessão expirada.")
+    user = await db.users.find_one({"user_id": session["user_id"]}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=401, detail="Usuário não encontrado.")
+    return user
+
+
+
 class ProfessorMessage(BaseModel):
     message: str
     session_id: Optional[str] = None
@@ -84,7 +175,12 @@ class ProfessorMessage(BaseModel):
 
 
 @api_router.post("/professor")
-async def professor(input: ProfessorMessage):
+async def professor(input: ProfessorMessage, user=Depends(get_current_user)):
+    if (user.get("plan") or "none") != "completo":
+        raise HTTPException(
+            status_code=403,
+            detail="O Professor IA está disponível apenas no plano Completo.",
+        )
     text = input.message.strip()[:600]
     if not text:
         raise HTTPException(status_code=400, detail="Mensagem vazia.")
@@ -120,6 +216,57 @@ async def professor(input: ProfessorMessage):
         {"session_id": session_id, "role": "assistant", "content": reply, "created_at": now},
     ])
     return {"reply": reply, "session_id": session_id}
+
+
+# ---------- Cakto webhook (liberação de acesso por pagamento) ----------
+
+
+@api_router.post("/webhooks/cakto")
+async def cakto_webhook(request: Request):
+    try:
+        body = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="JSON inválido.")
+
+    plan = _plan_for_secret(body.get("secret", ""))
+    if not plan:
+        # Não revela detalhes por segurança.
+        raise HTTPException(status_code=401, detail="Webhook não autorizado.")
+
+    event = body.get("event")
+    data = body.get("data") or {}
+
+    if event != "purchase_approved":
+        return {"ok": True, "ignored": True}
+
+    status_ = (data.get("status") or "").lower()
+    if status_ not in {"paid", "approved"}:
+        return {"ok": True, "ignored": True, "reason": "not_paid"}
+
+    customer = data.get("customer") or {}
+    email = (customer.get("email") or "").strip().lower()
+    if not email:
+        raise HTTPException(status_code=400, detail="Sem e-mail do cliente.")
+
+    order_id = str(data.get("id") or uuid.uuid4())
+    existing = await db.cakto_orders.find_one({"order_id": order_id}, {"_id": 0})
+    if existing:
+        return {"ok": True, "duplicate": True}
+
+    await db.cakto_orders.insert_one({
+        "order_id": order_id,
+        "email": email,
+        "plan": plan,
+        "status": status_,
+        "received_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+    granted = await _grant_plan_to_user(email, plan)
+    if not granted:
+        await _store_pending(email, plan)
+
+    logger.info("Cakto webhook: plan=%s granted=%s order=%s", plan, granted, order_id)
+    return {"ok": True, "plan": plan, "granted": granted}
 
 
 # ---------- Google Auth (Emergent-managed) ----------
@@ -168,35 +315,18 @@ async def auth_session(input: SessionExchange, response: Response):
         "session_token", token, path="/", secure=True, httponly=True,
         samesite="none", max_age=7 * 24 * 3600,
     )
-    return user_doc
-
-
-async def get_current_user(request: Request):
-    token = request.cookies.get("session_token")
-    auth = request.headers.get("Authorization")
-    if not token and auth and auth.startswith("Bearer "):
-        token = auth[7:]
-    if not token:
-        raise HTTPException(status_code=401, detail="Não autenticado.")
-    session = await db.user_sessions.find_one({"session_token": token}, {"_id": 0})
-    if not session:
-        raise HTTPException(status_code=401, detail="Sessão inválida.")
-    expires_at = session["expires_at"]
-    if isinstance(expires_at, str):
-        expires_at = datetime.fromisoformat(expires_at)
-    if expires_at.tzinfo is None:
-        expires_at = expires_at.replace(tzinfo=timezone.utc)
-    if expires_at < datetime.now(timezone.utc):
-        raise HTTPException(status_code=401, detail="Sessão expirada.")
-    user = await db.users.find_one({"user_id": session["user_id"]}, {"_id": 0})
-    if not user:
-        raise HTTPException(status_code=401, detail="Usuário não encontrado.")
-    return user
+    # Vincula qualquer compra pendente feita antes do login (mesmo e-mail).
+    await _claim_pending(email)
+    fresh = await db.users.find_one({"user_id": user_doc["user_id"]}, {"_id": 0})
+    return _with_flags(fresh or user_doc)
 
 
 @api_router.get("/auth/me")
 async def auth_me(user=Depends(get_current_user)):
-    return user
+    # Reivindica compras que chegaram depois do login.
+    await _claim_pending(user["email"])
+    fresh = await db.users.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    return _with_flags(fresh or user)
 
 
 @api_router.post("/auth/logout")

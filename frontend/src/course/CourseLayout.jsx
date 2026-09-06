@@ -135,6 +135,11 @@ function SidebarBody({ progress, onNavigate }) {
           >
             <GraduationCap className="h-[18px] w-[18px] shrink-0" />
             Professor IA
+            {!user?.professor_access && (
+              <span className="ml-auto flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-bold text-slate-300">
+                <Lock className="h-2.5 w-2.5" /> Completo
+              </span>
+            )}
           </button>
           <NavLink to="/curso/certificado" onClick={onNavigate} className={linkClass} data-testid="side-certificado">
             <Award className="h-[18px] w-[18px] shrink-0" />
