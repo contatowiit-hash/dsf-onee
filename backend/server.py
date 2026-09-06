@@ -19,10 +19,11 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "").strip()
 groq_client = AsyncOpenAI(
-    api_key=os.environ["GROQ_API_KEY"],
+    api_key=GROQ_API_KEY or "missing",
     base_url="https://api.groq.com/openai/v1",
-)
+) if GROQ_API_KEY else None
 
 PROFESSOR_SYSTEM_PROMPT = (
     "Você é o Professor ONEE, um professor virtual especializado em energia elétrica e "
@@ -88,6 +89,11 @@ async def professor(input: ProfessorMessage):
     if not text:
         raise HTTPException(status_code=400, detail="Mensagem vazia.")
     session_id = input.session_id or str(uuid.uuid4())
+    if groq_client is None:
+        raise HTTPException(
+            status_code=503,
+            detail="O Professor IA está temporariamente indisponível (chave da API não configurada).",
+        )
     history = await db.professor_chats.find(
         {"session_id": session_id}, {"_id": 0}
     ).sort("created_at", 1).to_list(24)

@@ -86,7 +86,7 @@ export default function Gamificacao() {
             </div>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       <div>
         <h2 className="font-display text-lg font-bold text-foreground">Como ganhar XP</h2>
