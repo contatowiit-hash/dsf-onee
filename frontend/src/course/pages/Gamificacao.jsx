@@ -1,7 +1,18 @@
 import { useOutletContext } from "react-router-dom";
+import { motion } from "framer-motion";
 import { TOTAL_LESSONS } from "@/course/data/modules";
 import { LEVELS, levelFor, XP_RULES } from "@/course/data/gamification";
+import CountUp from "@/components/CountUp";
 import { Gamepad2, Zap, BookOpen, Timer, Star, Award, Check } from "lucide-react";
+
+const staggerContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.07 } },
+};
+const staggerItem = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 280, damping: 24 } },
+};
 
 export default function Gamificacao() {
   const { progress } = useOutletContext();
@@ -28,7 +39,13 @@ export default function Gamificacao() {
         <p className="mt-1 text-muted-foreground">Seu XP, nível e conquistas de estudo.</p>
       </div>
 
-      <div className="rounded-2xl bg-ink p-6 text-white sm:p-8" data-testid="level-card">
+      <motion.div
+        initial={{ opacity: 0, y: 24, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ type: "spring", stiffness: 200, damping: 22 }}
+        className="rounded-2xl bg-ink p-6 text-white sm:p-8"
+        data-testid="level-card"
+      >
         <div className="flex items-end justify-between gap-4">
           <div>
             <p className="font-mono text-xs font-bold uppercase tracking-widest text-volt">Seu nível</p>
@@ -37,11 +54,16 @@ export default function Gamificacao() {
             </p>
           </div>
           <p className="font-display text-2xl font-extrabold text-volt sm:text-3xl" data-testid="xp-total">
-            {xp} XP
+            <CountUp value={xp} suffix=" XP" />
           </p>
         </div>
         <div className="mt-5 h-2.5 w-full overflow-hidden rounded-full bg-white/10">
-          <div className="h-full rounded-full bg-volt transition-all duration-700" style={{ width: `${pct}%` }} />
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${pct}%` }}
+            transition={{ type: "spring", stiffness: 45, damping: 16, delay: 0.35 }}
+            className="h-full rounded-full bg-volt"
+          />
         </div>
         <p className="mt-2 text-sm text-slate-400">
           {next ? `Faltam ${next.xp - xp} XP para ${next.name}` : "Nível máximo alcançado!"}

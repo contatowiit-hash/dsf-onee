@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { CheckCircle2, Lock } from "lucide-react";
 import { moduleProgress, isModuleUnlocked } from "@/course/data/modules";
 
@@ -7,9 +8,14 @@ export default function ModuleRow({ module, index, completed }) {
   const unlocked = isModuleUnlocked(index, completed);
 
   const content = (
-    <div
-      className={`flex items-center gap-4 rounded-2xl border border-border bg-card p-4 transition-all duration-200 sm:p-5 ${
-        unlocked ? "hover:-translate-y-0.5 hover:border-foreground/40" : "opacity-60"
+    <motion.div
+      initial={{ opacity: 0, y: 14 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-30px" }}
+      transition={{ type: "spring", stiffness: 260, damping: 24, delay: index * 0.05 }}
+      whileHover={unlocked ? { y: -3 } : {}}
+      className={`flex items-center gap-4 rounded-2xl border border-border bg-card p-4 transition-colors duration-200 sm:p-5 ${
+        unlocked ? "hover:border-foreground/40" : "opacity-60"
       }`}
       data-testid={`module-row-${module.id}`}
     >
@@ -25,9 +31,12 @@ export default function ModuleRow({ module, index, completed }) {
           {module.title}
         </p>
         <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-          <div
-            className="h-full rounded-full bg-volt transition-all duration-500"
-            style={{ width: `${pct}%` }}
+          <motion.div
+            initial={{ width: 0 }}
+            whileInView={{ width: `${pct}%` }}
+            viewport={{ once: true }}
+            transition={{ type: "spring", stiffness: 55, damping: 18, delay: 0.2 + index * 0.05 }}
+            className="h-full rounded-full bg-volt"
           />
         </div>
       </div>
@@ -44,7 +53,7 @@ export default function ModuleRow({ module, index, completed }) {
           <span className="text-xs font-semibold text-muted-foreground">{pct}%</span>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 
   return unlocked ? (

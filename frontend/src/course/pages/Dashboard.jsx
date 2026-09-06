@@ -1,9 +1,20 @@
 import { Link, useOutletContext } from "react-router-dom";
+import { motion } from "framer-motion";
 import { useAuth } from "@/context/AuthContext";
 import { MODULES, TOTAL_LESSONS, nextLesson } from "@/course/data/modules";
 import { levelFor, streakFrom } from "@/course/data/gamification";
 import ModuleRow from "@/course/components/ModuleRow";
+import CountUp from "@/components/CountUp";
 import { Timer, Layers, Gamepad2, BookOpen, ArrowRight, Zap, Flame } from "lucide-react";
+
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08 } },
+};
+const item = {
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 260, damping: 24 } },
+};
 
 const ACTIONS = [
   {
@@ -51,32 +62,45 @@ export default function Dashboard() {
   return (
     <div className="space-y-10" data-testid="dashboard">
       <div>
-        <h1 className="font-display text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl" data-testid="dashboard-greeting">
+        <motion.h1
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 200, damping: 22 }}
+          className="font-display text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl"
+          data-testid="dashboard-greeting"
+        >
           Olá, {firstName}!
-        </h1>
-        <p className="mt-1 text-muted-foreground">Continue sua preparação para a ONEE.</p>
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.15, duration: 0.5 }}
+          className="mt-1 text-muted-foreground"
+        >
+          Continue sua preparação para a ONEE.
+        </motion.p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-2xl border border-border bg-card p-4" data-testid="stat-xp">
+      <motion.div variants={container} initial="hidden" animate="show" className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <motion.div variants={item} className="rounded-2xl border border-border bg-card p-4" data-testid="stat-xp">
           <p className="flex items-center gap-1.5 text-xs text-muted-foreground"><Zap className="h-3.5 w-3.5" /> XP</p>
-          <p className="mt-1 font-display text-xl font-extrabold text-foreground sm:text-2xl">{xp}</p>
-        </div>
-        <div className="rounded-2xl border border-border bg-card p-4" data-testid="stat-level">
+          <CountUp value={xp} className="mt-1 block font-display text-xl font-extrabold text-foreground sm:text-2xl" />
+        </motion.div>
+        <motion.div variants={item} className="rounded-2xl border border-border bg-card p-4" data-testid="stat-level">
           <p className="text-xs text-muted-foreground">Nível</p>
           <p className="mt-1 truncate font-display text-xl font-extrabold text-foreground sm:text-2xl">{level.name}</p>
-        </div>
-        <div className="rounded-2xl border border-border bg-card p-4" data-testid="stat-streak">
+        </motion.div>
+        <motion.div variants={item} className="rounded-2xl border border-border bg-card p-4" data-testid="stat-streak">
           <p className="flex items-center gap-1.5 text-xs text-muted-foreground"><Flame className="h-3.5 w-3.5" /> Sequência</p>
           <p className="mt-1 font-display text-xl font-extrabold text-foreground sm:text-2xl">
-            {streak} {streak === 1 ? "dia" : "dias"}
+            <CountUp value={streak} /> {streak === 1 ? "dia" : "dias"}
           </p>
-        </div>
-        <div className="rounded-2xl border border-border bg-card p-4" data-testid="stat-simulados">
+        </motion.div>
+        <motion.div variants={item} className="rounded-2xl border border-border bg-card p-4" data-testid="stat-simulados">
           <p className="text-xs text-muted-foreground">Simulados</p>
-          <p className="mt-1 font-display text-xl font-extrabold text-foreground sm:text-2xl">{simuladosCount}</p>
-        </div>
-      </div>
+          <CountUp value={simuladosCount} className="mt-1 block font-display text-xl font-extrabold text-foreground sm:text-2xl" />
+        </motion.div>
+      </motion.div>
 
       <div className="rounded-2xl border border-border bg-card p-6 sm:p-7" data-testid="progress-card">
         <div className="flex items-center justify-between gap-4">
@@ -84,9 +108,11 @@ export default function Dashboard() {
           <span className="font-display text-2xl font-extrabold text-foreground">{pct}%</span>
         </div>
         <div className="mt-4 h-3 w-full overflow-hidden rounded-full bg-secondary">
-          <div
-            className="h-full rounded-full bg-volt transition-all duration-700"
-            style={{ width: `${pct}%` }}
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${pct}%` }}
+            transition={{ type: "spring", stiffness: 45, damping: 16, delay: 0.3 }}
+            className="h-full rounded-full bg-volt"
             data-testid="progress-bar"
           />
         </div>
@@ -112,26 +138,27 @@ export default function Dashboard() {
 
       <div>
         <h2 className="font-display text-lg font-bold text-foreground">Ações rápidas</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <motion.div variants={container} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-40px" }} className="mt-4 grid gap-4 sm:grid-cols-2">
           {ACTIONS.map((action) => (
-            <Link
-              key={action.to}
-              to={action.to}
-              className="group flex items-start gap-4 rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:-translate-y-1 hover:border-foreground/40"
-              data-testid={action.testid}
-            >
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-volt text-ink">
-                <action.icon className="h-5 w-5" />
-              </span>
-              <span>
-                <span className="block font-display text-base font-bold text-foreground">
-                  {action.title}
+            <motion.div key={action.to} variants={item} whileHover={{ y: -4 }} whileTap={{ scale: 0.98 }}>
+              <Link
+                to={action.to}
+                className="group flex h-full items-start gap-4 rounded-2xl border border-border bg-card p-5 transition-colors duration-200 hover:border-foreground/40"
+                data-testid={action.testid}
+              >
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-volt text-ink transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110">
+                  <action.icon className="h-5 w-5" />
                 </span>
-                <span className="mt-1 block text-sm text-muted-foreground">{action.description}</span>
-              </span>
-            </Link>
+                <span>
+                  <span className="block font-display text-base font-bold text-foreground">
+                    {action.title}
+                  </span>
+                  <span className="mt-1 block text-sm text-muted-foreground">{action.description}</span>
+                </span>
+              </Link>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
 
       <div>
